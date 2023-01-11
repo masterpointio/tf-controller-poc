@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: helloworld
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/gberenice/tf-controller-helloworld
+    targetRevision: main
+    path: ./infra
+  destination:
+    namespace: dev
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - ApplyOutOfSyncOnly=true
+    - FluxSubsystem=true
+    - AutoCreateFluxResources=true
+    - CreateNamespace=true
