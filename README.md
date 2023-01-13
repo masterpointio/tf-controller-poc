@@ -36,11 +36,21 @@ kubectl -n argocd port-forward svc/argocd-server 8080:443 &
 kubectl apply -f bootstrap/tf-controller.yaml
 ```
 
+* Create a K8s secret with the AWS creds
+
+```
+kubectl create ns dev
+kubectl -n dev create secret generic aws-credentials --from-literal=AWS_ACCESS_KEY_ID=$POC_ACCESS_KEY_ID --from-literal=AWS_SECRET_ACCESS_KEY=$POC_ACCESS_SECRET_KEY --from-literal=AWS_DEFAULT_REGION="us-east-1"
+```
+### Prepare backend - TODO: use SweetOps tf backend module
+* Create an S3 bucket `tf-controller-tfstate` to store tfstates
+* Create DynamoDB table
+
 ## Start GitOpsing
 
-Apply `hello-world` application:
+Apply `helloworld-tf` application:
 ```bash
-kubectl apply -f hello-world.yaml
+kubectl apply -f helloworld-tf.yaml
 ```
 
 Validate this installation:

@@ -1,13 +1,13 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: helloworld
+  name: helloworld-tf
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: https://github.com/gberenice/tf-controller-helloworld
-    targetRevision: main
+    targetRevision: backend_s3
     path: ./infra
   destination:
     namespace: dev
