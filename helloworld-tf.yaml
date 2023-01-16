@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/gberenice/tf-controller-helloworld
-    targetRevision: backend_s3
-    path: ./infra
+    repoURL: https://github.com/masterpointio/tf-controller-poc
+    targetRevision: poc-1
+    path: ./helloworld-tf/infra
   destination:
     namespace: dev
     server: https://kubernetes.default.svc
