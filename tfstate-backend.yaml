@@ -1,19 +1,16 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: tf-controller
+  name: tfstate-backend
   namespace: argocd
 spec:
   project: default
   source:
-    chart: tf-controller
-    repoURL: https://weaveworks.github.io/tf-controller
-    targetRevision: 0.9.1
-    helm:
-      values: |
-        logLevel: debug
+    repoURL: https://github.com/masterpointio/tf-controller-poc
+    targetRevision: poc-1
+    path: ./tfstate-backend/infra
   destination:
-    namespace: flux-system
+    namespace: global
     server: https://kubernetes.default.svc
   syncPolicy:
     automated:
@@ -23,3 +20,4 @@ spec:
     - ApplyOutOfSyncOnly=true
     - FluxSubsystem=true
     - AutoCreateFluxResources=true
+    - CreateNamespace=true
