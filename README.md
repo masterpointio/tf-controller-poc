@@ -43,17 +43,28 @@ kubectl apply -f bootstrap/tf-controller.yaml
 kubectl create ns global
 kubectl -n global create secret generic aws-credentials --from-literal=AWS_ACCESS_KEY_ID=$POC_ACCESS_KEY_ID --from-literal=AWS_SECRET_ACCESS_KEY=$POC_ACCESS_SECRET_KEY --from-literal=AWS_DEFAULT_REGION="us-east-1"
 ```
-### Prepare backend - TODO: use SweetOps tf backend module
-* Create an S3 bucket `tf-controller-tfstate` to store tfstates
-* Create DynamoDB table
+### Prepare backend
+* Apply manually `./tf-controller-poc/tfstate-backend/terraform/tfstate-backend`
 
 ## Start GitOpsing
 
+Apply `tfstate-backend` application:
+```bash
+kubectl apply -f tfstate-backend.yaml
+```
+
+Validate this installation (values will be encrypted):
+```bash
+kubectl -n global get secret tfstate-backend-outputs -o jsonpath="{.data}"
+```
+
+### TBD
 Apply `helloworld-tf` application:
 ```bash
 kubectl apply -f helloworld-tf.yaml
 ```
 
+kubectl -n global  get secret tfstate-backend-outputs -o jsonpath="{.data}"
 Validate this installation:
 ```bash
 kubectl -n dev get secret helloworld-outputs -o jsonpath="{.data.hello_world}" | base64 -d; echo

@@ -14,7 +14,7 @@ kind: Terraform
 metadata:
   name: tfstate-backend
 spec:
-  path: ./tfstate-backend/terraform/tfstate-backend
+  path: ./terraform/tfstate-backend
   workspace: global
   approvePlan: auto
   interval: 1m

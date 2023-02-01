@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/masterpointio/tf-controller-poc
     targetRevision: poc-1
-    path: ./tfstate-backend/infra
+    path: ./infra
   destination:
     namespace: global
     server: https://kubernetes.default.svc
