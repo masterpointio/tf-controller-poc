@@ -1,0 +1,33 @@
+---
+apiVersion: infra.contrib.fluxcd.io/v1alpha1
+kind: Terraform
+metadata:
+  name: tfstate-backend
+  namespace: infra
+spec:
+  path: ./terraform/tfstate-backend
+  workspace: global
+  approvePlan: auto
+  interval: 1m
+  backendConfig:
+    customConfiguration: |
+      backend "s3" {
+        bucket                      = "tf-controller-poc-terraform-state"
+        acl                         = "bucket-owner-full-control"
+        key                         = "terraform.tfstate"
+        workspace_key_prefix        = "tfstate-backend"
+        region                      = "us-east-1"
+        dynamodb_table              = "tf-controller-poc-terraform-state-lock"
+        encrypt                     = true
+      }
+  sourceRef:
+    kind: GitRepository
+    name: tf-controller-poc
+  writeOutputsToSecret:
+    name: tfstate-backend-outputs
+  # `aws-credentials` should be created manually. In real setup this should be configured with IRSA.
+  runnerPodTemplate:
+    spec:
+      envFrom:
+      - secretRef:
+          name: aws-credentials

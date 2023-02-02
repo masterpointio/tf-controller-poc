@@ -1,3 +1,4 @@
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -23,3 +24,27 @@ spec:
     - ApplyOutOfSyncOnly=true
     - FluxSubsystem=true
     - AutoCreateFluxResources=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: bootstrap
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/masterpointio/tf-controller-poc
+    targetRevision: poc-1
+    path: ./bootstrap/
+  destination:
+    namespace: infra
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - ApplyOutOfSyncOnly=true
+    - FluxSubsystem=true
+    - AutoCreateFluxResources=true
+    - CreateNamespace=true

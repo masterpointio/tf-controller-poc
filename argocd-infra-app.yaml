@@ -10,7 +10,7 @@ spec:
     targetRevision: poc-1
     path: ./infra
   destination:
-    namespace: global
+    namespace: infra
     server: https://kubernetes.default.svc
   syncPolicy:
     automated:

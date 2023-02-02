@@ -39,9 +39,8 @@ kubectl apply -f bootstrap/tf-controller.yaml
 * Create a K8s secret with the AWS creds
 
 ```
-#kubectl create ns dev
-kubectl create ns global
-kubectl -n global create secret generic aws-credentials --from-literal=AWS_ACCESS_KEY_ID=$POC_ACCESS_KEY_ID --from-literal=AWS_SECRET_ACCESS_KEY=$POC_ACCESS_SECRET_KEY --from-literal=AWS_DEFAULT_REGION="us-east-1"
+kubectl create ns infra
+kubectl -n infra create secret generic aws-credentials --from-literal=AWS_ACCESS_KEY_ID=$POC_ACCESS_KEY_ID --from-literal=AWS_SECRET_ACCESS_KEY=$POC_ACCESS_SECRET_KEY --from-literal=AWS_DEFAULT_REGION="us-east-1"
 ```
 ### Prepare backend
 * Apply manually `./tf-controller-poc/tfstate-backend/terraform/tfstate-backend`

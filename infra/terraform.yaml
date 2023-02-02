@@ -1,55 +1,11 @@
 ---
-apiVersion: source.toolkit.fluxcd.io/v1beta1
-kind: GitRepository
-metadata:
-  name: tf-controller-poc
-spec:
-  interval: 1m
-  url: https://github.com/masterpointio/tf-controller-poc
-  ref:
-    branch: poc-1
----
-apiVersion: infra.contrib.fluxcd.io/v1alpha1
-kind: Terraform
-metadata:
-  name: tfstate-backend
-spec:
-  path: ./terraform/tfstate-backend
-  workspace: global
-  approvePlan: auto
-  interval: 1m
-  destroyResourcesOnDeletion: true
-  backendConfig:
-    customConfiguration: |
-      backend "s3" {
-        bucket                      = "tf-controller-poc-terraform-state"
-        acl                         = "bucket-owner-full-control"
-        key                         = "terraform.tfstate"
-        workspace_key_prefix        = "tfstate-backend"
-        region                      = "us-east-1"
-        dynamodb_table              = "tf-controller-poc-terraform-state-lock"
-        encrypt                     = true
-      }
-  sourceRef:
-    kind: GitRepository
-    name: tf-controller-poc
-  writeOutputsToSecret:
-    name: tfstate-backend-outputs
-  destroyResourcesOnDeletion: true
-  # `aws-credentials` should be created manually. In real setup this should be configured with IRSA.
-  runnerPodTemplate:
-    spec:
-      envFrom:
-      - secretRef:
-          name: aws-credentials
----
 apiVersion: infra.contrib.fluxcd.io/v1alpha1
 kind: Terraform
 metadata:
   name: vpc
 spec:
   path: ./terraform/vpc
-  workspace: dev
+  workspace: poc
   approvePlan: auto
   interval: 1m
   backendConfig:
@@ -63,21 +19,16 @@ spec:
         dynamodb_table              = "tf-controller-poc-terraform-state-lock"
         encrypt                     = true
       }
+  varsFrom:
+  - kind: ConfigMap
+    name: shared-tfvars
   vars:
-    - name: region
-      value: us-east-1
     - name: namespace
       value: tf-controller
-    - name: stage
-      value: poc
-    - name: name
-      value: terraform
     - name: ipv4_primary_cidr_block
       value: 10.0.0.0/16
     - name: availability_zones
       value: ["us-east-1a", "us-east-1b", "us-east-1c"]
-    - name: enabled
-      value: true
     - name: nat_gateway_enabled
       value: true
     - name: nat_instance_enabled
