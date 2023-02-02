@@ -1,9 +1,4 @@
-output "vpc_id" {
-  value       = module.vpc.vpc_id
-  description = "VPC ID"
-}
-
-output "vpc_cidr" {
-  value       = module.vpc.vpc_cidr_block
-  description = "VPC CIDR"
+output "instance_name" {
+  value       = module.ec2_instance.instance_name
+  description = "EC2 Instance name."
 }

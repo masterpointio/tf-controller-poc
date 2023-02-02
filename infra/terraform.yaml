@@ -1,19 +1,17 @@
-### Shared entries START
-# `aws-credentials` should be created manually. In real setup this should be configured with IRSA.
-runnerPodTemplate: &runnerPodTemplate
-  spec:
-    envFrom:
-    - secretRef:
-        name: aws-credentials
+#
+# runnerPodTemplate: &runnerPodTemplate
+#   spec:
+#     envFrom:
+#     - secretRef:
+#         name: aws-credentials
 
-sourceRef: &sourceRef
-  kind: GitRepository
-  name: tf-controller-poc
+# sourceRef: &sourceRef
+#   kind: GitRepository
+#   name: tf-controller-poc
 
-varsFrom: &sharedVarsFrom
-- kind: ConfigMap
-  name: shared-tfvars
-### Shared entries END
+# varsFrom: &varsFrom
+# - kind: ConfigMap
+#   name: shared-tfvars
 ---
 apiVersion: infra.contrib.fluxcd.io/v1alpha1
 kind: Terraform
@@ -55,7 +53,18 @@ spec:
   writeOutputsToSecret:
     name: vpc-outputs
   destroyResourcesOnDeletion: true
-  <<: [*sourceRef, *runnerPodTemplate, *sharedVarsFrom]
+  sourceRef:
+    kind: GitRepository
+    name: tf-controller-poc
+  varsFrom:
+  - kind: ConfigMap
+    name: shared-tfvars
+  runnerPodTemplate:
+    spec:
+      envFrom:
+      - secretRef:
+          name: aws-credentials # `aws-credentials` should be created manually. In real setup this should be configured with IRSA.
+
 ---
 apiVersion: infra.contrib.fluxcd.io/v1alpha1
 kind: Terraform
@@ -80,4 +89,14 @@ spec:
   writeOutputsToSecret:
     name: ec2-outputs
   destroyResourcesOnDeletion: true
-  <<: [*sourceRef, *runnerPodTemplate, *sharedVarsFrom]
+  sourceRef:
+    kind: GitRepository
+    name: tf-controller-poc
+  varsFrom:
+  - kind: ConfigMap
+    name: shared-tfvars
+  runnerPodTemplate:
+    spec:
+      envFrom:
+      - secretRef:
+          name: aws-credentials # `aws-credentials` should be created manually. In real setup this should be configured with IRSA.
