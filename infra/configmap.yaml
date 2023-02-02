@@ -3,6 +3,7 @@ kind: ConfigMap
 metadata:
   name: shared-tfvars
 data:
-  region: "us-east-1"
-  stage: "poc"
   enabled: "true"
+  region: "us-east-1"
+  namespace: "tf-controller"
+  stage: "poc"

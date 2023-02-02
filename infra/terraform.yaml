@@ -1,3 +1,19 @@
+### Shared entries START
+# `aws-credentials` should be created manually. In real setup this should be configured with IRSA.
+runnerPodTemplate: &runnerPodTemplate
+  spec:
+    envFrom:
+    - secretRef:
+        name: aws-credentials
+
+sourceRef: &sourceRef
+  kind: GitRepository
+  name: tf-controller-poc
+
+varsFrom: &sharedVarsFrom
+- kind: ConfigMap
+  name: shared-tfvars
+### Shared entries END
 ---
 apiVersion: infra.contrib.fluxcd.io/v1alpha1
 kind: Terraform
@@ -19,12 +35,7 @@ spec:
         dynamodb_table              = "tf-controller-poc-terraform-state-lock"
         encrypt                     = true
       }
-  varsFrom:
-  - kind: ConfigMap
-    name: shared-tfvars
   vars:
-    - name: namespace
-      value: tf-controller
     - name: ipv4_primary_cidr_block
       value: 10.0.0.0/16
     - name: availability_zones
@@ -41,15 +52,32 @@ spec:
       value: false
     - name: subnet_type_tag_key
       value: "tf-controller/subnet/type"
-  sourceRef:
-    kind: GitRepository
-    name: tf-controller-poc
   writeOutputsToSecret:
     name: vpc-outputs
   destroyResourcesOnDeletion: true
-  # `aws-credentials` should be created manually. In real setup this should be configured with IRSA.
-  runnerPodTemplate:
-    spec:
-      envFrom:
-      - secretRef:
-          name: aws-credentials
+  <<: [*sourceRef, *runnerPodTemplate, *sharedVarsFrom]
+---
+apiVersion: infra.contrib.fluxcd.io/v1alpha1
+kind: Terraform
+metadata:
+  name: ec2
+spec:
+  path: ./terraform/ec2
+  workspace: poc
+  approvePlan: auto
+  interval: 1m
+  backendConfig:
+    customConfiguration: |
+      backend "s3" {
+        bucket                      = "tf-controller-poc-terraform-state"
+        acl                         = "bucket-owner-full-control"
+        key                         = "terraform.tfstate"
+        workspace_key_prefix        = "ec2"
+        region                      = "us-east-1"
+        dynamodb_table              = "tf-controller-poc-terraform-state-lock"
+        encrypt                     = true
+      }
+  writeOutputsToSecret:
+    name: ec2-outputs
+  destroyResourcesOnDeletion: true
+  <<: [*sourceRef, *runnerPodTemplate, *sharedVarsFrom]
