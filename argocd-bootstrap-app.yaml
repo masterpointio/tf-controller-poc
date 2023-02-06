@@ -4,6 +4,8 @@ kind: Application
 metadata:
   name: tf-controller
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
@@ -12,7 +14,7 @@ spec:
     targetRevision: 0.9.1
     helm:
       values: |
-        logLevel: debug
+        logLevel: info
   destination:
     namespace: flux-system
     server: https://kubernetes.default.svc
@@ -30,6 +32,8 @@ kind: Application
 metadata:
   name: bootstrap
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
