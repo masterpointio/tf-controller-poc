@@ -86,10 +86,10 @@ kubectl apply -f ./argocd-infra-app.yaml
     helm -n flux-system history tf-controller
     ```
 
-* To watch runner logs:
+* To watch runner logs for `ec2`:
 
     ```bash
-    kubectl -n infra logs -f tfstate-backend-tf-runner
+    kubectl -n infra logs -f ec2-tf-runner
     ```
     Runner name is compiled using the pattern: `<Terraform_Object_Name>-tf-runner`
 

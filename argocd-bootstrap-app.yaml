@@ -38,7 +38,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/masterpointio/tf-controller-poc
-    targetRevision: poc-1
+    targetRevision: master
     path: ./bootstrap/
   destination:
     namespace: infra

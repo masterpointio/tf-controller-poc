@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/masterpointio/tf-controller-poc
-    targetRevision: poc-1
+    targetRevision: master
     path: ./infra
   destination:
     namespace: infra
