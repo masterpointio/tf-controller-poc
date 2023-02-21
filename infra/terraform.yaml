@@ -1,0 +1,88 @@
+---
+apiVersion: infra.contrib.fluxcd.io/v1alpha1
+kind: Terraform
+metadata:
+  name: vpc
+spec:
+  path: ./terraform/vpc
+  workspace: poc
+  approvePlan: auto
+  interval: 1m
+  backendConfig:
+    customConfiguration: |
+      backend "s3" {
+        bucket                      = "tf-controller-poc-terraform-state"
+        acl                         = "bucket-owner-full-control"
+        key                         = "terraform.tfstate"
+        workspace_key_prefix        = "vpc"
+        region                      = "us-east-1"
+        dynamodb_table              = "tf-controller-poc-terraform-state-lock"
+        encrypt                     = true
+      }
+  vars:
+    - name: ipv4_primary_cidr_block
+      value: 10.0.0.0/16
+    - name: availability_zones
+      value: ["us-east-1a", "us-east-1b", "us-east-1c"]
+    - name: nat_gateway_enabled
+      value: true
+    - name: nat_instance_enabled
+      value: false
+    - name: max_subnet_count
+      value: 3
+    - name: eks_tags_enabled
+      value: false
+    - name: vpc_flow_logs_enabled
+      value: false
+    - name: subnet_type_tag_key
+      value: "tf-controller/subnet/type"
+  writeOutputsToSecret:
+    name: vpc-outputs
+  destroyResourcesOnDeletion: true
+  sourceRef:
+    kind: GitRepository
+    name: tf-controller-poc
+  varsFrom:
+  - kind: ConfigMap
+    name: shared-tfvars
+  runnerPodTemplate:
+    spec:
+      envFrom:
+      - secretRef:
+          name: aws-credentials # `aws-credentials` should be created manually. In real setup this should be configured with IRSA.
+
+---
+apiVersion: infra.contrib.fluxcd.io/v1alpha1
+kind: Terraform
+metadata:
+  name: ec2
+spec:
+  path: ./terraform/ec2
+  workspace: poc
+  approvePlan: auto
+  interval: 1m
+  backendConfig:
+    customConfiguration: |
+      backend "s3" {
+        bucket                      = "tf-controller-poc-terraform-state"
+        acl                         = "bucket-owner-full-control"
+        key                         = "terraform.tfstate"
+        workspace_key_prefix        = "ec2"
+        region                      = "us-east-1"
+        dynamodb_table              = "tf-controller-poc-terraform-state-lock"
+        encrypt                     = true
+      }
+  writeOutputsToSecret:
+    name: ec2-outputs
+  destroyResourcesOnDeletion: true
+  sourceRef:
+    kind: GitRepository
+    name: tf-controller-poc
+  varsFrom:
+  - kind: ConfigMap
+    name: shared-tfvars
+  runnerPodTemplate:
+    spec:
+      envFrom:
+      - secretRef:
+          name: aws-credentials # `aws-credentials` should be created manually. In real setup this should be configured with IRSA.
